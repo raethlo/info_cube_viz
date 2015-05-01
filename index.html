@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Info Cube viz</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!--<link rel=stylesheet href="css/base.css"/>-->
+</head>
+<body>
+
+<script src="node_modules/three/three.js"></script>
+<script src="js/Detector.js"></script>
+<!--<script src="js/Stats.js"></script>-->
+<!--<script src="js/OrbitControls.js"></script>-->
+<script src="js/THREEx.KeyboardState.js"></script>
+<script src="js/THREEx.FullScreen.js"></script>
+<script src="js/THREEx.WindowResize.js"></script>
+<script src="js/OrbitControls.js"></script>
+
+<!-- jQuery code to display an information button and box when clicked. -->
+<script src="node_modules/jquery/dist/jquery.js"></script>
+<script src="node_modules/jquery-ui/jquery-ui.js"></script>
+<link rel=stylesheet href="node_modules/jquery-ui/themes/base/jquery-ui.css"/>
+<!-- ------------------------------------------------------------ -->
+
+<div id="ThreeJS" style="z-index: 1; position: absolute; left:0px; top:0px"></div>
+<script>
+
+    // MAIN
+
+    // standard global variables
+    var container, scene, camera, renderer, controls, stats;
+    var keyboard = new THREEx.KeyboardState();
+    var clock = new THREE.Clock();
+    // custom global variables
+    var cube;
+
+    init();
+    animate();
+
+    function init() {
+
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 1000;
+
+        scene = new THREE.Scene();
+
+        geometry = new THREE.BoxGeometry( 200, 200, 200 );
+        material = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true ,opacity: 0.5} );
+
+        var boxMaterial = new THREE.MeshLambertMaterial({
+            depthWrite: false,
+            transparent: true,
+            color: 0xff0000,
+            opacity: 0.5,
+            side: THREE.DoubleSide,
+            combine: THREE.MixOperation
+        });
+
+        var boxMaterial2 = new THREE.MeshLambertMaterial({
+            depthWrite: false,
+            transparent: true,
+            color: 0x00ff00,
+            opacity: 0.5,
+            side: THREE.DoubleSide,
+            combine: THREE.MixOperation
+        });
+
+
+        geometry2 = new THREE.BoxGeometry( 100, 100, 100 );
+//        geometry.scale(0.5)
+        material2 = new THREE.MeshBasicMaterial( { color: 0x00ff00, transparent:true, opacity: 0.5 } );
+
+        mesh = new THREE.Mesh( geometry, boxMaterial );
+        mesh2 = new THREE.Mesh( geometry2, boxMaterial2);
+
+
+        var geometry = new THREE.BoxGeometry(20,20,20);
+        mesh3 = new THREE.Mesh(geometry,material);
+        mesh.position.set(10,10,10);
+
+        mesh4 = THREE.Box3();
+
+        scene.add( mesh );
+        scene.add( mesh2 );
+        scene.add(mesh3);
+        scene.add(mesh4);
+
+        var ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+        scene.add(ambientLight);
+
+        renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        THREEx.WindowResize(renderer, camera);
+        THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+
+
+
+
+        scene.add(Floor());
+        scene.add(SkyBox());
+        scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
+
+
+        var light = new THREE.PointLight(0xffffff);
+        light.position.set(0,1000,1000);
+        scene.add(light);
+
+        var lamp = THREE.CubeGeometry(50,50,50);
+        lamp.position.set(0,1000,1000);
+        scene.add(lamp);
+
+        document.body.appendChild( renderer.domElement );
+
+    }
+
+    function Floor(){
+        var floorMaterial = new THREE.MeshBasicMaterial( { color: 0xf4a460, side: THREE.DoubleSide } );
+        var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+        var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.position.y = -100;
+        floor.rotation.x = Math.PI / 2;
+        return floor;
+    }
+
+    function SkyBox(){
+        var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+        var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+        var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+        return skyBox;
+    }
+
+    function animate()
+    {
+        requestAnimationFrame( animate );
+
+//        mesh.rotation.x += 0.01;
+//        mesh.rotation.y += 0.02;
+
+        render();
+        update();
+    }
+
+    function update()
+    {
+        if ( keyboard.pressed("z") )
+        {
+            // do something
+        }
+
+        controls.update();
+    }
+
+    function render()
+    {
+        renderer.render( scene, camera );
+    }
+
+</script>
+
+</body>
+</html>

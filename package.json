@@ -1,0 +1,19 @@
+{
+  "name": "info_cube_viz",
+  "version": "1.0.0",
+  "description": "An information cube visualisation attempt",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "raethlo",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "^2.1.4",
+    "jquery-ui": "^1.10.5",
+    "three": "^0.71.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
