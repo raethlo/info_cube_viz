@@ -11,7 +11,8 @@
   "dependencies": {
     "jquery": "^2.1.4",
     "jquery-ui": "^1.10.5",
-    "three": "^0.71.0"
+    "three": "^0.71.0",
+    "tween.js": "^0.14.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5"
