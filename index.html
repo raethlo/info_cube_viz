@@ -9,6 +9,7 @@
 <body>
 
 <script src="node_modules/three/three.js"></script>
+<script src="node_modules/tween.js"></script>
 <script src="js/Detector.js"></script>
 <!--<script src="js/Stats.js"></script>-->
 <!--<script src="js/OrbitControls.js"></script>-->
@@ -29,7 +30,7 @@
     // MAIN
 
     // standard global variables
-    var container, scene, camera, renderer, controls, stats;
+    var container, scene, camera, renderer, controls, stats, light;
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
     // custom global variables
@@ -54,7 +55,7 @@
             color: 0xff0000,
             opacity: 0.5,
             side: THREE.DoubleSide,
-            combine: THREE.MixOperation
+            combine: THREE.AdditiveBlending
         });
 
         var boxMaterial2 = new THREE.MeshLambertMaterial({
@@ -63,7 +64,7 @@
             color: 0x00ff00,
             opacity: 0.5,
             side: THREE.DoubleSide,
-            combine: THREE.MixOperation
+            combine: THREE.AdditiveBlending
         });
 
 
@@ -73,20 +74,23 @@
 
         mesh = new THREE.Mesh( geometry, boxMaterial );
         mesh2 = new THREE.Mesh( geometry2, boxMaterial2);
-
+        mesh.geometry.computeBoundingBox();
+        mesh2.geometry.computeBoundingBox();
 
         var geometry = new THREE.BoxGeometry(20,20,20);
-        mesh3 = new THREE.Mesh(geometry,material);
-        mesh.position.set(10,10,10);
+        mesh3 = new THREE.Mesh(geometry,boxMaterial);
+        mesh.position.set(10,10,20);
 
         mesh4 = THREE.Box3();
 
+        mesh.add(mesh2);
+        mesh2.add(mesh3);
+
         scene.add( mesh );
-        scene.add( mesh2 );
-        scene.add(mesh3);
+
         scene.add(mesh4);
 
-        var ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+        var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
         scene.add(ambientLight);
 
         renderer = new THREE.WebGLRenderer({antialias:true});
@@ -105,15 +109,39 @@
         scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
 
 
-        var light = new THREE.PointLight(0xffffff);
-        light.position.set(0,1000,1000);
+        light = new THREE.PointLight(0xffffff);
+        light.position = camera.position;
         scene.add(light);
 
-        var lamp = THREE.CubeGeometry(50,50,50);
-        lamp.position.set(0,1000,1000);
-        scene.add(lamp);
+//        var lampG = THREE.CubeGeometry(50,50,50);
+//        var lamp = THREE.Mesh(geometry2, material2);
+       // lamp.position.set(0,1000,1000);
+//        scene.add(lamp);
 
         document.body.appendChild( renderer.domElement );
+
+    }
+
+    function Box(options){
+        var options = options || {};
+
+        var color = options.color || 0xff0000;
+        var opacity = options.opacity || 0.5;
+        var size = options.size || 10;
+
+        var geo = new THREE.BoxGeometry(size,size,size);
+
+        var material = new THREE.MeshLambertMaterial({
+            depthWrite: false,
+            transparent: true,
+            color: color,
+            opacity: opacity,
+            side: THREE.DoubleSide,
+            combine: THREE.AdditiveBlending
+        });
+
+        return new THREE.Mesh(geo, material );
+
 
     }
 
@@ -140,17 +168,31 @@
 //        mesh.rotation.x += 0.01;
 //        mesh.rotation.y += 0.02;
 
+//        if(mesh.geometry.boundingBox.containsBox(mesh2.geometry.boundingBox)) {
+//            mesh2.translateX(1);
+//            mesh2.geometry.boundingBox.setFromObject(mesh2);
+//        }
+
+//        console.log(light.position);
+//        console.log(camera.position);
+//        console.log('-----');
+
+        light.position.set(camera.position.x,camera.position.y,camera.position.z);
+
         render();
         update();
     }
 
-    function update()
+    function update(time)
     {
         if ( keyboard.pressed("z") )
         {
             // do something
         }
 
+//        new TWEEN.Tween( cube.scale ).to( { y: 10 }, 3000 );
+
+        TWEEN.update(time);
         controls.update();
     }
 
