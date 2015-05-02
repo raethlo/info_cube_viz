@@ -46,53 +46,6 @@
 
         scene = new THREE.Scene();
 
-        geometry = new THREE.BoxGeometry( 200, 200, 200 );
-        material = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true ,opacity: 0.5} );
-
-        var boxMaterial = new THREE.MeshLambertMaterial({
-            depthWrite: false,
-            transparent: true,
-            color: 0xff0000,
-            opacity: 0.5,
-            side: THREE.DoubleSide,
-            combine: THREE.AdditiveBlending
-        });
-
-        var boxMaterial2 = new THREE.MeshLambertMaterial({
-            depthWrite: false,
-            transparent: true,
-            color: 0x00ff00,
-            opacity: 0.5,
-            side: THREE.DoubleSide,
-            combine: THREE.AdditiveBlending
-        });
-
-
-        geometry2 = new THREE.BoxGeometry( 100, 100, 100 );
-//        geometry.scale(0.5)
-        material2 = new THREE.MeshBasicMaterial( { color: 0x00ff00, transparent:true, opacity: 0.5 } );
-
-        mesh = new THREE.Mesh( geometry, boxMaterial );
-        mesh2 = new THREE.Mesh( geometry2, boxMaterial2);
-        mesh.geometry.computeBoundingBox();
-        mesh2.geometry.computeBoundingBox();
-
-        var geometry = new THREE.BoxGeometry(20,20,20);
-        mesh3 = new THREE.Mesh(geometry,boxMaterial);
-        mesh.position.set(10,10,20);
-
-        mesh4 = THREE.Box3();
-
-        mesh.add(mesh2);
-        mesh2.add(mesh3);
-
-        scene.add( mesh );
-
-        scene.add(mesh4);
-
-        var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
-        scene.add(ambientLight);
-
         renderer = new THREE.WebGLRenderer({antialias:true});
         renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -102,7 +55,28 @@
         THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
 
+        mesh = new Box({size: 150});
+        mesh2 = new Box({size: 100, color: 0xff0000});
 
+        mesh.geometry.computeBoundingBox();
+        mesh2.geometry.computeBoundingBox();
+
+        for(var i = 0; i < 5; ++i )
+            createChild(mesh);
+        mesh3 = new Box({size: 20});
+//
+        mesh.add(mesh2);
+        mesh2.add(mesh3);
+
+        scene.add( mesh );
+
+//        mesh.position.set(10,10,20);
+//
+//        mesh2.position.set(20,20,20);
+
+//        scene.add(mesh4);
+        var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
+        scene.add(ambientLight);
 
         scene.add(Floor());
         scene.add(SkyBox());
@@ -112,11 +86,6 @@
         light = new THREE.PointLight(0xffffff);
         light.position = camera.position;
         scene.add(light);
-
-//        var lampG = THREE.CubeGeometry(50,50,50);
-//        var lamp = THREE.Mesh(geometry2, material2);
-       // lamp.position.set(0,1000,1000);
-//        scene.add(lamp);
 
         document.body.appendChild( renderer.domElement );
 
@@ -132,17 +101,23 @@
         var geo = new THREE.BoxGeometry(size,size,size);
 
         var material = new THREE.MeshLambertMaterial({
-            depthWrite: false,
+//            depthWrite: false,
             transparent: true,
             color: color,
             opacity: opacity,
-            side: THREE.DoubleSide,
+            side: THREE.BackSide,
             combine: THREE.AdditiveBlending
         });
 
         return new THREE.Mesh(geo, material );
 
 
+    }
+
+    function createChild(box){
+        child = new Box();
+
+        box.add(child);
     }
 
     function Floor(){
@@ -179,8 +154,8 @@
 
         light.position.set(camera.position.x,camera.position.y,camera.position.z);
 
-        render();
         update();
+        render();
     }
 
     function update(time)
