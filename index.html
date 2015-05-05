@@ -42,9 +42,9 @@
     function init() {
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 300;
-        camera.position.x = 100;
-        camera.position.y = 50;
+        camera.position.z = 200;
+        camera.position.x = 300;
+        camera.position.y = 400;
 
         scene = new THREE.Scene();
 
@@ -57,7 +57,8 @@
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
 
-        mesh = new Box({size: 150, order: 4});
+        mesh = new Box({size: 200, order: 4});
+        tutu = mesh;
 //        mesh2 = new Box({size: 50, color: 0xf0019f, order: 3});
 
         updateBoundingBox(mesh);
@@ -65,20 +66,29 @@
 
 //        mesh3 = new Box({size: 20, color: 0x00ff00, order: 2});
 
-        for(var i = 0; i < 3; ++i ) {
-            createChild(mesh, {size: 50, color: 0xf0019f, order: 3});
+        for(var i = 0; i < 10; ++i ) {
+            createChild(mesh, {size: 30, color: 0xf0019f, order: 3});
         }
 
-//
-//        mesh.add(mesh2);
-//        mesh2.add(mesh3);
+        mesh.children.forEach(function(node){
+            for(var i = 0 ; i< 3; i++){
+                createChild(node,{size: 10, color: 0xa0ff00});
+//                node.translateX(Math.random()*2-1);
+//                node.translateY(Math.random()*2-1);
+//                node.translateZ(Math.random()*2-1);
+            }
+//            node.children.forEach(function(_){
+//                _.translateX(Math.random()*2-1);
+//                _.translateY(Math.random()*2-1);
+//                _.translateZ(Math.random()*2-1);
+//            })
+        });
 
         scene.add( mesh );
 
         var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
         scene.add(ambientLight);
 
-//        scene.add(Floor());
         scene.add(SkyBox());
         scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
 
@@ -122,7 +132,7 @@
         if(cube.children.length === 0)
             return;
 
-        var passes = 500;
+        var passes = 300;
 
         updateBoundingBox(cube);
         var children = cube.children;
@@ -136,15 +146,20 @@
                 var currentChild = children[j];
 
                 for( var k = 1; k < children.length; k++){
-                    childToMoveIndex = (j + k + children.length - 1) % children.length;
+                    //computes position of child which is to move
+                    childToMoveIndex = (j + k + children.length) % children.length;
                     childToMove = children[childToMoveIndex];
 
+                    //creates a normalized vector currentChild -> childToMove
                     vector = childToMove.position.clone().sub(currentChild.position).normalize();
 
+                    //creates a decoiy box and tests if it is still in the parent mesh
                     decoy = new THREE.Box3().setFromObject( childToMove );
                     decoy.position = childToMove.position.clone();
-                    decoy.position.add(vector.multiplyScalar(5));
+                    decoy.position.add(vector); //.multiplyScalar(Math.floor(Math.random()*5+1))
 
+                    //if it is in the parent mesh we should update the child's
+                    // position and its bounding box
                     if(cube.geometry.boundingBox.containsBox(decoy)){
                         childToMove.position.set(decoy.position.x,decoy.position.y,decoy.position.z);
                         updateBoundingBox(childToMove);
@@ -165,14 +180,11 @@
 
         child.geometry.computeBoundingBox();
 
-//        while
-        var xRange = box.geometry.boundingBox.max.x
-
-        var x = box.position.x;
-        var y = box.position.y;
-        var z = box.position.z;
-
-        child.position;
+        child.position.set(
+                Math.random() * 2 -1,
+                Math.random() * 2 -1,
+                Math.random() * 2 -1
+        );
 
         box.add(child);
     }
@@ -228,7 +240,6 @@
 //        console.log(light.position);
 //        console.log(camera.position);
 //        console.log('-----');
-
         light.position.set(camera.position.x,camera.position.y,camera.position.z);
 
         update();
@@ -243,7 +254,6 @@
         }
 
 //        new TWEEN.Tween( cube.scale ).to( { y: 10 }, 3000 );
-
         TWEEN.update(time);
         controls.update();
     }
