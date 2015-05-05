@@ -5,26 +5,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <!--<link rel=stylesheet href="css/base.css"/>-->
+    <script src="node_modules/three/three.js"></script>
+    <script src="node_modules/tween.js"></script>
+    <script src="js/Detector.js"></script>
+    <!--<script src="js/Stats.js"></script>-->
+    <!--<script src="js/OrbitControls.js"></script>-->
+    <script src="js/THREEx.KeyboardState.js"></script>
+    <script src="js/THREEx.FullScreen.js"></script>
+    <script src="js/THREEx.WindowResize.js"></script>
+    <script src="js/OrbitControls.js"></script>
+
+    <!-- jQuery code to display an information button and box when clicked. -->
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/jquery-ui/jquery-ui.js"></script>
+    <link rel=stylesheet href="node_modules/jquery-ui/themes/base/jquery-ui.css"/>
 </head>
 <body>
 
-<script src="node_modules/three/three.js"></script>
-<script src="node_modules/tween.js"></script>
-<script src="js/Detector.js"></script>
-<!--<script src="js/Stats.js"></script>-->
-<!--<script src="js/OrbitControls.js"></script>-->
-<script src="js/THREEx.KeyboardState.js"></script>
-<script src="js/THREEx.FullScreen.js"></script>
-<script src="js/THREEx.WindowResize.js"></script>
-<script src="js/OrbitControls.js"></script>
 
-<!-- jQuery code to display an information button and box when clicked. -->
-<script src="node_modules/jquery/dist/jquery.js"></script>
-<script src="node_modules/jquery-ui/jquery-ui.js"></script>
-<link rel=stylesheet href="node_modules/jquery-ui/themes/base/jquery-ui.css"/>
 <!-- ------------------------------------------------------------ -->
 
-<div id="ThreeJS" style="z-index: 1; position: absolute; left:0px; top:0px"></div>
+<div id="three" style="z-index: 1; position: relative; left:0px; top:0px"></div>
+
+<div style="width: 100px"></div>>
 <script>
 
     // MAIN
@@ -169,7 +172,6 @@
             }
         }
 
-        console.log('children')
         cube.children.forEach(arrangeChildren);
     };
 
@@ -180,6 +182,7 @@
 
         child.geometry.computeBoundingBox();
 
+        //randomly alter the childs location from (0,0,0)
         child.position.set(
                 Math.random() * 2 -1,
                 Math.random() * 2 -1,
