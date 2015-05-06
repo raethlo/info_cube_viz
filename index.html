@@ -25,15 +25,15 @@
 
 <!-- ------------------------------------------------------------ -->
 
-<div id="three" style="z-index: 1; position: relative; left:0px; top:0px"></div>
+<div id="three" style="z-index: 1; position: relative; left:0px; top:0px; width:500; float:left"></div>
 
-<div style="width: 100px"></div>>
+<div style="width: 100px; float:left"></div>>
 <script>
 
     // MAIN
 
     // standard global variables
-    var container, scene, camera, renderer, controls, stats, light;
+    var container, scene, camera, renderer, controls, light;
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
     // custom global variables
@@ -60,31 +60,25 @@
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
 
-        mesh = new Box({size: 200, order: 4});
-        tutu = mesh;
-//        mesh2 = new Box({size: 50, color: 0xf0019f, order: 3});
+        mesh = new Box({size: 1000, order: 4});
 
         updateBoundingBox(mesh);
-//        updateBoundingBox(mesh2);
 
-//        mesh3 = new Box({size: 20, color: 0x00ff00, order: 2});
+        var rand = Math.floor(Math.random()*60)+3;
 
-        for(var i = 0; i < 10; ++i ) {
-            createChild(mesh, {size: 30, color: 0xf0019f, order: 3});
+        for(var i = 0; i < rand; ++i ) {
+            var size = Math.floor(1000/rand)*2 - 5;
+            createChild(mesh, {size: size, color: getRandomColor(), order: 3});
         }
 
         mesh.children.forEach(function(node){
-            for(var i = 0 ; i< 3; i++){
-                createChild(node,{size: 10, color: 0xa0ff00});
-//                node.translateX(Math.random()*2-1);
-//                node.translateY(Math.random()*2-1);
-//                node.translateZ(Math.random()*2-1);
-            }
-//            node.children.forEach(function(_){
-//                _.translateX(Math.random()*2-1);
-//                _.translateY(Math.random()*2-1);
-//                _.translateZ(Math.random()*2-1);
-//            })
+            var rand = Math.floor(Math.random()*300)+300;
+            var size = node.geometry.boundingBox.size().x *2 / rand;
+
+            if(rand < 20)
+                for(var i = 0 ; i< rand; i++){
+                    createChild(node,{size: size, color: getRandomColor()});
+                }
         });
 
         scene.add( mesh );
@@ -92,15 +86,13 @@
         var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
         scene.add(ambientLight);
 
-        scene.add(SkyBox());
-        scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
-
+//        scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
 
         light = new THREE.PointLight(0xffffff);
         light.position = camera.position;
         scene.add(light);
 
-        document.body.appendChild( renderer.domElement );
+        document.getElementById('three').appendChild( renderer.domElement );
 
     }
 
@@ -116,7 +108,6 @@
         var geo = new THREE.BoxGeometry(size,size,size);
 
         var material = new THREE.MeshLambertMaterial({
-//            depthWrite: false,
             transparent: true,
             color: color,
             opacity: opacity,
@@ -135,7 +126,7 @@
         if(cube.children.length === 0)
             return;
 
-        var passes = 300;
+        var passes = 200;
 
         updateBoundingBox(cube);
         var children = cube.children;
@@ -172,7 +163,8 @@
             }
         }
 
-        cube.children.forEach(arrangeChildren);
+        if(children.length < 20)
+            children.forEach(arrangeChildren);
     };
 
     function createChild(box,options){
@@ -264,6 +256,44 @@
     function render()
     {
         renderer.render( scene, camera );
+    }
+
+    function rainbow(numOfSteps, step) {
+        // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+        // Adam Cole, 2011-Sept-14
+        // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+        var r, g, b;
+        var h = step / numOfSteps;
+        var i = ~~(h * 6);
+        var f = h * 6 - i;
+        var q = 1 - f;
+        switch(i % 6){
+            case 0: r = 1, g = f, b = 0; break;
+            case 1: r = q, g = 1, b = 0; break;
+            case 2: r = 0, g = 1, b = f; break;
+            case 3: r = 0, g = q, b = 1; break;
+            case 4: r = f, g = 0, b = 1; break;
+            case 5: r = 1, g = 0, b = q; break;
+        }
+        var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+        return (c);
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function createScructure(data,scene){
+
+    }
+
+    function createChildStructure(data){
+
     }
 
 </script>
