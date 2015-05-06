@@ -28,8 +28,13 @@
 <div id="three" style="z-index: 1; position: relative; left:0px; top:0px; width:500; float:left"></div>
 
 <div style="width: 100px; float:left"></div>>
-<script>
 
+<script>
+    //TODO dont add node's children if there are too many
+    //TODO load data from file
+    //TODO picking to zoom/higlight to a node
+    //TODO zoom inside ... in the structure
+    //TODO render a d3 tree to navigate possibly?
     // MAIN
 
     // standard global variables
@@ -292,7 +297,7 @@
 
     }
 
-    function createChildStructure(data){
+    function createChildStructure(data,limit){
 
     }
 
