@@ -25,7 +25,7 @@
 
 <!-- ------------------------------------------------------------ -->
 
-<div id="three" style="z-index: 1; position: relative; left:0px; top:0px; width:500; float:left"></div>
+<div id="three" style="z-index: 1; position: relative; left:0px; top:0px; width: 500px; float:left"></div>
 
 <div style="width: 100px; float:left"></div>>
 
@@ -38,7 +38,7 @@
     // MAIN
 
     // standard global variables
-    var container, scene, camera, renderer, controls, light;
+    var container, scene, camera, renderer, controls, light, data;
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
     // custom global variables
@@ -58,35 +58,18 @@
 
         renderer = new THREE.WebGLRenderer({antialias:true});
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setClearColor(0xcccccc);
 
         controls = new THREE.OrbitControls( camera, renderer.domElement );
 
         THREEx.WindowResize(renderer, camera);
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
+//        demoShowCase(scene);
 
-        mesh = new Box({size: 1000, order: 4});
+        $.getJSON('flare.json', function(r){ data = r});
 
-        updateBoundingBox(mesh);
-
-        var rand = Math.floor(Math.random()*60)+3;
-
-        for(var i = 0; i < rand; ++i ) {
-            var size = Math.floor(1000/rand)*2 - 5;
-            createChild(mesh, {size: size, color: getRandomColor(), order: 3});
-        }
-
-        mesh.children.forEach(function(node){
-            var rand = Math.floor(Math.random()*300)+300;
-            var size = node.geometry.boundingBox.size().x *2 / rand;
-
-            if(rand < 20)
-                for(var i = 0 ; i< rand; i++){
-                    createChild(node,{size: size, color: getRandomColor()});
-                }
-        });
-
-        scene.add( mesh );
+        createScructure(data, scene);
 
         var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
         scene.add(ambientLight);
@@ -99,6 +82,31 @@
 
         document.getElementById('three').appendChild( renderer.domElement );
 
+    }
+
+    function demoShowCase(scene){
+        mesh = new Box({size: 1000, order: 4, color: getRandomColor()});
+
+        updateBoundingBox(mesh);
+
+        var rand = Math.floor(Math.random()*60)+3;
+
+        for(var i = 0; i < rand; ++i ) {
+            var size = Math.floor(1000/rand*1.2) - 5;
+            createChild(mesh, {size: size, color: getRandomColor(), order: 3});
+        }
+
+        mesh.children.forEach(function(node){
+            var rand = Math.floor(Math.random()*300)+300;
+            var size = Math.floor(node.geometry.boundingBox.size().x / rand * 1.2);
+
+            if(rand < 20)
+                for(var i = 0 ; i< rand; i++){
+                    createChild(node,{size: size, color: getRandomColor()});
+                }
+        });
+
+        scene.add( mesh );
     }
 
     function Box(options){
@@ -131,7 +139,7 @@
         if(cube.children.length === 0)
             return;
 
-        var passes = 200;
+        var passes = 300;
 
         updateBoundingBox(cube);
         var children = cube.children;
@@ -294,10 +302,16 @@
     }
 
     function createScructure(data,scene){
+        mesh = new Box({size: 1000, order: 4, color: getRandomColor()});
+        mesh.userData = { name: data.name};
+        scene.add(mesh);
+
+        //createChildStructure(parent, data.children,)
 
     }
 
-    function createChildStructure(data,limit){
+    function createChildStructure(parent, data, limit){
+
 
     }
 
