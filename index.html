@@ -25,9 +25,7 @@
 
 <!-- ------------------------------------------------------------ -->
 
-<div id="three" style="z-index: 1; position: relative; left:0px; top:0px; width: 500px; float:left"></div>
-
-<div style="width: 100px; float:left"></div>>
+<div id="three" style="z-index: 1; position: relative; left:0px; top:0px; float:right"></div>
 
 <script>
     //TODO dont add node's children if there are too many
@@ -38,7 +36,18 @@
     // MAIN
 
     // standard global variables
-    var container, scene, camera, renderer, controls, light;//, data;
+    var container = document.getElementById('three'),
+            scene, pickingScene,
+            camera,
+            renderer,
+            controls,
+            light,
+            root,
+            cubesToIntersect = [];
+
+    var raycaster = new THREE.Raycaster();
+    var mouse = new THREE.Vector3();
+
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
     // custom global variables
@@ -56,8 +65,10 @@
 
         scene = new THREE.Scene();
 
+        pickingScene = new THREE.Scene();
+
         renderer = new THREE.WebGLRenderer({antialias:true});
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth, window.innerHeight);
         renderer.setClearColor(0xcccccc);
 
         controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -66,24 +77,47 @@
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
         $.getJSON('flare.json', function(r){
-            console.log(r);
 
-            createStructure(r, scene);
+            root = createStructure(r, scene);
+
+            var info = document.createElement( 'div' );
+
+            info.style.position = 'relative';
+            info.style.top = '10px';
+            info.style.right = '10px';
+            info.style.width = '100%';
+            info.style.textAlign = 'left';
+            info.innerHTML = root.name;
+            container.appendChild( info );
+
+            if(root.children) {
+                root.children.forEach(function (node) {
+                    var size = node.geometry.boundingBox.size().x;
+                    var geom = new THREE.BoxGeometry(size,size,size);
+                    var mesh = new THREE.Mesh(geom);
+
+                    mesh.position.copy(node.position);
+                    mesh.rotation.copy(node.rotation);
+
+
+
+                    pickingScene.add(mesh);
+                });
+            }
         });
 
-
-
         var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
+
         scene.add(ambientLight);
 
-//        scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
-
         light = new THREE.PointLight(0xffffff);
+
         light.position = camera.position;
         scene.add(light);
+        container.appendChild( renderer.domElement );
 
-        document.getElementById('three').appendChild( renderer.domElement );
-
+        // when the mouse moves, call the given function
+        document.addEventListener( 'mousedown', onDocumentMouseDown, false );
     }
 
     function demoShowCase(scene){
@@ -196,6 +230,7 @@
                 Math.random() * 2 -1
         );
 
+//        scene.add(child);
         parent.add(child);
 
         return child;
@@ -311,7 +346,7 @@
 
         // i can set the root node render order to depth limit
         // because it also denotes the number of nested levels
-        rootCube = new Box({name: data.name, order: depthLimit + 1, size: 1000, order: 4, color: getRandomColor()});
+        var rootCube = new Box({name: data.name, order: depthLimit + 1, size: 1000, color: getRandomColor()});
         scene.add(rootCube);
 
         if (data.children != null) {
@@ -319,6 +354,8 @@
         }
 
         arrangeChildren(rootCube);
+
+        return rootCube;
 
     }
 
@@ -334,19 +371,44 @@
 
         var childSize = Math.floor(parent.geometry.boundingBox.size().x / children.length) + 1;
 
-        console.log(childSize);
-
         for(var i = 0; i < children.length; i++){
             var child = children[i];
 
-            console.log(child);
-
             var childBox = createChild(parent, {name: child.name, size: childSize, order: depthLimit + 1 });
             if(depthLimit > 1 && child.children != null){
+                cubesToIntersect.push(childBox);
                 createChildStructure(childBox, child.children, depthLimit -1 , maxChildrenPerBox);
             }
         }
 
+
+    }
+
+    function onDocumentMouseDown( event )
+    {
+
+//        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+//        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        renderer.render(pickingScene,camera);
+
+        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
+        mouse.y = 1 - 2 * ( event.clientY / window.innerHeight );
+        mouse.z = 0.5;
+
+        raycaster.setFromCamera( mouse, camera );
+
+        // calculate objects intersecting the picking ray
+        var intersects = raycaster.intersectObjects( pickingScene.children, true );
+
+        console.log(intersects);
+
+        for( var i = 0; i < intersects.length; i++ ) {
+            var intersection = intersects[ i ],
+                    obj = intersection.object;
+
+            //obj.material.color.setRGB( 1.0 - i / intersects.length, 0, 0 );
+            console.log(intersection)
+        }
 
     }
 
