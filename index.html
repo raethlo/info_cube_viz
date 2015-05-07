@@ -43,6 +43,7 @@
             controls,
             light,
             root,
+            info,
             cubesToIntersect = [];
 
     var raycaster = new THREE.Raycaster();
@@ -80,13 +81,12 @@
 
             root = createStructure(r, scene);
 
-            var info = document.createElement( 'div' );
+            info = document.createElement( 'div' );
 
-            info.style.position = 'relative';
+            info.style.position = 'absolute';
             info.style.top = '10px';
-            info.style.right = '10px';
             info.style.width = '100%';
-            info.style.textAlign = 'left';
+            info.style.textAlign = 'center';
             info.innerHTML = root.name;
             container.appendChild( info );
 
@@ -99,7 +99,7 @@
                     mesh.position.copy(node.position);
                     mesh.rotation.copy(node.rotation);
 
-
+                    mesh.userData = node;
 
                     pickingScene.add(mesh);
                 });
@@ -276,17 +276,6 @@
     {
         requestAnimationFrame( animate );
 
-//        mesh.rotation.x += 0.01;
-//        mesh.rotation.y += 0.02;
-
-//        if(mesh.geometry.boundingBox.containsBox(mesh3.geometry.boundingBox)) {
-//            mesh3.translateX(1);
-//            mesh3.geometry.boundingBox.setFromObject(mesh3);
-//        }
-
-//        console.log(light.position);
-//        console.log(camera.position);
-//        console.log('-----');
         light.position.set(camera.position.x,camera.position.y,camera.position.z);
 
         update();
@@ -387,12 +376,12 @@
     function onDocumentMouseDown( event )
     {
 
-//        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-//        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
         renderer.render(pickingScene,camera);
 
-        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
-        mouse.y = 1 - 2 * ( event.clientY / window.innerHeight );
+//        mouse.x = 2 * (event.clientX / window.innerWidth) - 1;
+//        mouse.y = 1 - 2 * ( event.clientY / window.innerHeight );
         mouse.z = 0.5;
 
         raycaster.setFromCamera( mouse, camera );
@@ -400,14 +389,15 @@
         // calculate objects intersecting the picking ray
         var intersects = raycaster.intersectObjects( pickingScene.children, true );
 
-        console.log(intersects);
-
         for( var i = 0; i < intersects.length; i++ ) {
             var intersection = intersects[ i ],
                     obj = intersection.object;
 
+//            info.innerHTML = intersects[0].userData.name;
             //obj.material.color.setRGB( 1.0 - i / intersects.length, 0, 0 );
-            console.log(intersection)
+            //console.log(intersection);
+            console.log(obj.userData);
+            info.innerHTML = obj.userData.name;
         }
 
     }
