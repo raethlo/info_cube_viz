@@ -68,7 +68,7 @@
         $.getJSON('flare.json', function(r){
             console.log(r);
 
-            createScructure(r, scene);
+            createStructure(r, scene);
         });
 
 
@@ -114,7 +114,7 @@
     function Box(options){
         var options = options || {};
 
-        var color = options.color || 0xff0000;
+        var color = options.color || getRandomColor();
         var opacity = options.opacity || 0.7;
         var size = options.size || 10;
         var name = options.name || "none";
@@ -182,10 +182,10 @@
             children.forEach(arrangeChildren);
     };
 
-    function createChild(box,options){
+    function createChild(parent,options){
         child = new Box(options);
 
-        box.geometry.computeBoundingBox();
+        parent.geometry.computeBoundingBox();
 
         child.geometry.computeBoundingBox();
 
@@ -196,7 +196,9 @@
                 Math.random() * 2 -1
         );
 
-        box.add(child);
+        parent.add(child);
+
+        return child;
     }
 
     function doesNotIntersect(box,children){
@@ -303,16 +305,47 @@
         return color;
     }
 
-    function createScructure(data,scene){
-        var mesh = new Box({size: 1000, order: 4, color: getRandomColor()});
-        mesh.name = data.name;
-        scene.add(mesh);
+    function createStructure(data, scene, depthLimit, maxChildrenPerBox){
+        depthLimit = depthLimit || 3;
+        maxChildrenPerBox = maxChildrenPerBox || 30;
 
-        //createChildStructure(parent, data.children,)
+        // i can set the root node render order to depth limit
+        // because it also denotes the number of nested levels
+        rootCube = new Box({name: data.name, order: depthLimit + 1, size: 1000, order: 4, color: getRandomColor()});
+        scene.add(rootCube);
+
+        if (data.children != null) {
+            createChildStructure(rootCube, data.children, depthLimit, maxChildrenPerBox);
+        }
+
+        arrangeChildren(rootCube);
 
     }
 
-    function createChildStructure(parent, data, limit){
+    function createChildStructure(parent, children, depthLimit, maxChildrenPerBox){
+
+        if(depthLimit === 0)
+            return;
+
+        if(children.length > maxChildrenPerBox)
+            return;
+
+        updateBoundingBox(parent);
+
+        var childSize = Math.floor(parent.geometry.boundingBox.size().x / children.length) + 1;
+
+        console.log(childSize);
+
+        for(var i = 0; i < children.length; i++){
+            var child = children[i];
+
+            console.log(child);
+
+            var childBox = createChild(parent, {name: child.name, size: childSize, order: depthLimit + 1 });
+            if(depthLimit > 1 && child.children != null){
+                createChildStructure(childBox, child.children, depthLimit -1 , maxChildrenPerBox);
+            }
+        }
 
 
     }
