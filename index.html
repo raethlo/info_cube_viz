@@ -38,7 +38,7 @@
     // MAIN
 
     // standard global variables
-    var container, scene, camera, renderer, controls, light, data;
+    var container, scene, camera, renderer, controls, light;//, data;
     var keyboard = new THREEx.KeyboardState();
     var clock = new THREE.Clock();
     // custom global variables
@@ -50,9 +50,9 @@
     function init() {
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 200;
-        camera.position.x = 300;
-        camera.position.y = 400;
+        camera.position.z = 500;
+        camera.position.x = 600;
+        camera.position.y = 800;
 
         scene = new THREE.Scene();
 
@@ -65,11 +65,13 @@
         THREEx.WindowResize(renderer, camera);
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
-//        demoShowCase(scene);
+        $.getJSON('flare.json', function(r){
+            console.log(r);
 
-        $.getJSON('flare.json', function(r){ data = r});
+            createScructure(r, scene);
+        });
 
-        createScructure(data, scene);
+
 
         var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
         scene.add(ambientLight);
@@ -302,8 +304,8 @@
     }
 
     function createScructure(data,scene){
-        mesh = new Box({size: 1000, order: 4, color: getRandomColor()});
-        mesh.userData = { name: data.name};
+        var mesh = new Box({size: 1000, order: 4, color: getRandomColor()});
+        mesh.name = data.name;
         scene.add(mesh);
 
         //createChildStructure(parent, data.children,)
