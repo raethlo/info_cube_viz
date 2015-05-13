@@ -44,6 +44,8 @@
                 light,
                 root,
                 info,
+                selected,
+                unselectColor,
                 cubesToIntersect = [];
 
         var raycaster = new THREE.Raycaster();
@@ -63,6 +65,8 @@
             camera.position.z = 500;
             camera.position.x = 600;
             camera.position.y = 800;
+
+            unselectColor = new THREE.Color();
 
             scene = new THREE.Scene();
 
@@ -404,6 +408,35 @@
 
         }
 
+        function checkSelected(selected, amount, uncheck, unselectColor){
+            amount = amount || 0.1;
+            uncheck = uncheck || false;
+
+            if(amount > 1 || amount < 0) { amount = 0.1 }
+            if(uncheck) { amount = -amount }
+
+            var r = selected.material.color.r + amount;
+            var g = selected.material.color.g + amount;
+            var b = selected.material.color.b + amount;
+
+            if(r > 1) { r = 1}
+            if(g > 1) { r = 1}
+            if(b > 1) { r = 1}
+
+            if(r < 0) { r = 0}
+            if(g < 0) { r = 0}
+            if(b < 0) { r = 0}
+
+            if(uncheck) {
+                if(!unselectColor) { unselectColor = new THREE.Color(r,g,b) }
+                selected.material.color.copy(unselectColor);
+            }
+            else {
+                selected.material.color.setRGB(r,g,b);
+            }
+
+        }
+
         function onDocumentMouseClick( event )
         {
             event.preventDefault();
@@ -422,6 +455,13 @@
             for( var i = 0; i < intersects.length; i++ ) {
                 var intersection = intersects[ i ],
                         obj = intersection.object;
+
+                if(selected){ checkSelected(selected,0.1, true, unselectColor) }
+
+                selected = obj.userData;
+
+                unselectColor.copy(selected.material.color);
+                checkSelected(selected,0.1);
 
                 info.innerHTML = "<h1>"+obj.userData.name+"</h1>";
 
