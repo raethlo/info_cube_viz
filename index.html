@@ -205,6 +205,7 @@
                         if(cube.geometry.boundingBox.containsBox(decoy)){
                             childToMove.position.copy(decoy.position);
                             childToMove.updateMatrix();
+                            updateBoundingBox(childToMove);
                         }
 
                     }
@@ -285,12 +286,39 @@
         {
             if ( keyboard.pressed("z") )
             {
-                // do something
+                $.getJSON('flare.json', function(r){
+
+                    scene.remove(root);
+
+                    root = createStructure(r, scene);
+
+                    info.innerHTML = root.name;
+
+                    updatePickingScene(root,pickingScene);
+                });
             }
 
-    //        new TWEEN.Tween( cube.scale ).to( { y: 10 }, 3000 );
             TWEEN.update(time);
             controls.update();
+        }
+
+        function updatePickingScene(root,pickingScene){
+            while(pickingScene.children && pickingScene.children.length > 0) { pickingScene.children.pop() }
+
+            if(root.children) {
+                root.children.forEach(function (node) {
+                    var size = node.geometry.boundingBox.size().x;
+                    var geom = new THREE.BoxGeometry(size,size,size);
+                    var mesh = new THREE.Mesh(geom);
+
+                    mesh.position.copy(node.position);
+                    mesh.rotation.copy(node.rotation);
+
+                    mesh.userData = node;
+
+                    pickingScene.add(mesh);
+                });
+            }
         }
 
         function render()
@@ -335,6 +363,8 @@
             // i can set the root node render order to depth limit
             // because it also denotes the number of nested levels
             var rootCube = new Box({name: data.name, order: depthLimit + 1, size: 1000, color: rainbow(4,depthLimit + 1)});
+            rootCube.userData = data;
+
             updateBoundingBox(rootCube);
             scene.add(rootCube);
 
@@ -364,6 +394,7 @@
                 var child = children[i];
 
                 var childBox = createChild(parent, { name: child.name, size: childSize, order: depthLimit + 1, color: rainbow(4, depthLimit) });
+                childBox.userData = child;
                 if(depthLimit > 1 && child.children != null){
                     cubesToIntersect.push(childBox);
                     createChildStructure(childBox, child.children, depthLimit -1 , maxChildrenPerBox);
@@ -375,10 +406,13 @@
 
         function onDocumentMouseClick( event )
         {
+            event.preventDefault();
+
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            //mouse.z = 0.5;
+
             renderer.render(pickingScene,camera);
-            mouse.z = 0.5;
 
             raycaster.setFromCamera( mouse, camera );
 
@@ -389,7 +423,16 @@
                 var intersection = intersects[ i ],
                         obj = intersection.object;
 
-                info.innerHTML = obj.userData.name;
+                info.innerHTML = "<h1>"+obj.userData.name+"</h1>";
+            }
+
+            if(event.ctrlKey){
+                console.log(root);
+                console.log(obj.userData);
+                scene.remove(root);
+                root = createStructure(obj.userData.userData,scene);
+                 updatePickingScene(root,pickingScene);
+//                root = obj.userData;
             }
 
         }
