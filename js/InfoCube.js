@@ -1,6 +1,6 @@
 
 
-InfoCube = function(data, domElement){
+InfoCube = function(data, domElement, maxChildrenPerBox, depthLimit){
 
     var container = domElement,
         data = data,
@@ -13,7 +13,9 @@ InfoCube = function(data, domElement){
         info,
         selected,
         unselectColor,
-        cubesToIntersect = [];
+        cubesToIntersect = [],
+        maxChildrenPerBox = maxChildrenPerBox || 30,
+        depthLimit = depthLimit || 3;
 
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector3();
@@ -42,7 +44,7 @@ InfoCube = function(data, domElement){
         THREEx.WindowResize(renderer, camera);
         THREEx.FullScreen.bindKey({ charCode : 'f'.charCodeAt(0) });
 
-        root = createStructure(data, scene);
+        root = createStructure(data, scene, depthLimit, maxChildrenPerBox);
 
         info = document.createElement( 'div' );
 
@@ -233,7 +235,7 @@ InfoCube = function(data, domElement){
         {
             scene.remove(root);
 
-            root = createStructure(data, scene);
+            root = createStructure(data, scene, depthLimit, maxChildrenPerBox);
 
             info.innerHTML = '<h1>' + root.name + '</h1>';
 
@@ -333,7 +335,7 @@ InfoCube = function(data, domElement){
 
             if(event.ctrlKey){
                 scene.remove(root);
-                root = createStructure(obj.userData.userData,scene);
+                root = createStructure(obj.userData.userData,scene, depthLimit, maxChildrenPerBox);
                 updatePickingScene(root,pickingScene);
             }
         }
