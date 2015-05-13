@@ -35,7 +35,7 @@
             var threeElement = document.getElementById('three');
 
             $.getJSON('flare.json',function(data){
-                infoCube = InfoCube(data, threeElement);
+                infoCube = new InfoCube(data, threeElement);
             })
         });
 

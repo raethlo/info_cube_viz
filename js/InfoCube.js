@@ -1,5 +1,4 @@
 
-//InfoCube = InfoCube || {};
 
 InfoCube = function(data, domElement){
 
@@ -236,9 +235,18 @@ InfoCube = function(data, domElement){
 
             root = createStructure(data, scene);
 
-            info.innerHTML = root.name;
+            info.innerHTML = '<h1>' + root.name + '</h1>';
 
             updatePickingScene(root,pickingScene);
+        }
+
+        if ( keyboard.pressed("x") )
+        {
+            if(selected){
+                checkSelected(selected,0.1,true,unselectColor);
+                selected = null;
+                info.innerHTML = '<h1>' + root.name + '</h1>';
+            }
         }
 
         TWEEN.update(time);
@@ -294,7 +302,6 @@ InfoCube = function(data, domElement){
             }
         }
 
-
     }
 
     function onDocumentMouseClick( event ) {
@@ -344,13 +351,13 @@ InfoCube = function(data, domElement){
         var g = selected.material.color.g + amount;
         var b = selected.material.color.b + amount;
 
-        if(r > 1) { r = 1}
-        if(g > 1) { r = 1}
+        if(r > 1) { r = 1 }
+        if(g > 1) { r = 1 }
         if(b > 1) { r = 1}
 
-        if(r < 0) { r = 0}
-        if(g < 0) { r = 0}
-        if(b < 0) { r = 0}
+        if(r < 0) { r = 0 }
+        if(g < 0) { r = 0 }
+        if(b < 0) { r = 0 }
 
         if(uncheck) {
             if(!unselectColor) { unselectColor = new THREE.Color(r,g,b) }
@@ -417,8 +424,6 @@ InfoCube = function(data, domElement){
 
         scene.add( mesh );
     }
-
-
 
     init();
     animate();
