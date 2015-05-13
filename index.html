@@ -466,8 +466,6 @@
                 info.innerHTML = "<h1>"+obj.userData.name+"</h1>";
 
                 if(event.ctrlKey){
-                    console.log(root);
-                    console.log(obj.userData);
                     scene.remove(root);
                     root = createStructure(obj.userData.userData,scene);
                     updatePickingScene(root,pickingScene);
