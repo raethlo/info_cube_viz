@@ -51,7 +51,7 @@ InfoCube = function(data, domElement){
         info.style.top = '10px';
         info.style.width = '100%';
         info.style.textAlign = 'center';
-        info.innerHTML = root.name;
+        info.innerHTML = '<h1>' + root.name + '</h1>';
 
         console.log(container);
 
